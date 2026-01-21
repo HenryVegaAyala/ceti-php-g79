@@ -1,0 +1,18 @@
+name: "php-ceti"
+
+services:
+  api:
+    container_name: "php-api"
+    hostname: "php-api"
+    image: php:8.5.2-fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+
+  php:
+    container_name: "php-7"
+    hostname: "php-7"
+    image: php:7.4-fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
