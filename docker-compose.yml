@@ -4,7 +4,10 @@ services:
   api:
     container_name: "php-api"
     hostname: "php-api"
-    image: php:8.5.2-fpm-alpine
+#    image: php:8.5.2-fpm-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
       - ./:/var/www/html
