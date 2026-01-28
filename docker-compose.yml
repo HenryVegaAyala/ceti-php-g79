@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      - ./:/var/www/html
+      - ./html:/var/www
     depends_on:
       - postgres
     networks:
