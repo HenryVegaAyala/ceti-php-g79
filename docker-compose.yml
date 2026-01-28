@@ -8,11 +8,38 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/var/www/html
+    depends_on:
+      - postgres
+    networks:
+      - api_network
 
-  php:
-    container_name: "php-7"
-    hostname: "php-7"
-    image: php:7.4-fpm-alpine
+  postgres:
+    container_name: "postgres"
+    hostname: "postgres"
+    image: postgres:16
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: crud_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret123
+    ports:
+      - "5460:5432"
     volumes:
-      - ./:/var/www/html
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - api_network
+
+#  php:
+#    container_name: "php-7"
+#    hostname: "php-7"
+#    image: php:7.4-fpm-alpine
+#    restart: unless-stopped
+#    volumes:
+#      - ./:/var/www/html
+
+volumes:
+  postgres_data:
+
+networks:
+    api_network:
+      driver: bridge
