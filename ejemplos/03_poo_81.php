@@ -1,5 +1,6 @@
 <?php
 
+# ENUM de ESTADOS
 enum EstadoPedido
 {
     case Pendiente;
@@ -31,6 +32,7 @@ enum EstadoPedido
     }
 }
 
+# INTERFACES
 interface Identificable
 {
     public function getId(): int;
@@ -41,16 +43,23 @@ interface Describible
     public function getDescripcion(): string;
 }
 
+# CLASE PEDIDO que implementa las interfaces
 class Pedido implements Identificable, Describible
 {
     public int $id;
     public string $nombre;
-
     public string $fechaCreacion;
-
-    private $estado;
-
+    private EstadoPedido $estado;
     private array $productos = [];
+
+    public function __construct(
+        public string $cliente,
+        $estado = EstadoPedido::Pendiente
+    )
+    {
+        $this->id = random_int(1000, 9999);
+        $this->fechaCreacion = date("Y-m-d H:i:s");
+    }
 
     public function getId(): int
     {
