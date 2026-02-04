@@ -1,4 +1,14 @@
 <?php
+require_once 'config/database.php';
+require_once 'models/Usuario.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+$usuario = new Usuario($db);
+
+// Crear la tabla si no existe
+$usuario->createTable();
 
 $hello = "Crud Usuarios - PostgresSQL 16";
 
