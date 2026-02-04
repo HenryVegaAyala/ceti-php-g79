@@ -21,7 +21,6 @@ class Usuario
         $this->connection = $connection;
     }
 
-
     public function createTable(): bool
     {
         try {
@@ -40,5 +39,57 @@ class Usuario
             echo "Error creando la tabla: " . $e->getMessage();
             return false;
         }
+    }
+
+    public function create()
+    {
+        $stmt = $this->connection->prepare(
+            "INSERT INTO {$this->table} (nombre, email, telefono) 
+             VALUES (:nombre, :email, :telefono)"
+        );
+
+        try {
+            $stmt->execute([
+                ':email' => $this->email,
+                ':nombre' => $this->nombre,
+                ':telefono' => $this->telefono
+            ]);
+            return true;
+
+        } catch (PDOException $e) {
+            echo "Error al crear un usuario: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function update()
+    {
+        $stmt = $this->connection->prepare(
+            "UPDATE {$this->table} 
+            nombre = :nombre, 
+            email = :email, 
+            telefono = :telefono
+            WHERE id = :id"
+        );
+
+        $stmt->execute([
+            ':email' => $this->email,
+            ':nombre' => $this->nombre,
+            ':telefono' => $this->telefono,
+            ':id' => $this->id
+        ]);
+    }
+
+    public function delete()
+    {
+
+    }
+
+    public function readAll()
+    {
+        $stmt = $this->connection->prepare("SELECT {$this->columns} FROM {$this->table} ORDER BY id DESC");
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

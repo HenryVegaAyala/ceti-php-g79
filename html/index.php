@@ -1,5 +1,5 @@
 <?php
-require_once 'config/database.php';
+require_once 'config/Database.php';
 require_once 'models/Usuario.php';
 
 $database = new Database();
@@ -9,6 +9,57 @@ $usuario = new Usuario($db);
 
 // Crear la tabla si no existe
 $usuario->createTable();
+
+$messages = [
+        'created' => 'Usuario creado exitosamente.',
+        'updated' => 'Usuario actualizado exitosamente.',
+        'deleted' => 'Usuario eliminado exitosamente.'
+];
+
+$mensaje = null;
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $action = $_POST["action"] ?? null;
+
+    $usuario->nombre = $_POST["nombre"] ?? null;
+    $usuario->email = $_POST["email"] ?? null;
+    $usuario->telefono = $_POST["telefono"] ?? null;
+
+    $acciones = [
+            'create' => ['method' => 'create', 'message' => 'created', 'error' => 'Error al crear el usuario'],
+            'update' => ['method' => 'update', 'message' => 'updated', 'error' => 'Error al actualizar el usuario'],
+            'delete' => [],
+    ];
+
+    if (isset($acciones[$action])) {
+        $config = $acciones[$action];
+
+        //  crear usuario
+        if ($config['method'] == 'create') {
+            $respuesta = $usuario->create();
+
+            if ($respuesta) {
+                header("Location: index.php?message={$config['message']}");
+                exit();
+            } else {
+                $mensaje = $config['error'];
+            }
+        }
+
+        // actualizar usuario
+        if ($config['method'] == 'update') {
+
+        }
+
+        // eliminar usuario
+        if ($config['method'] == 'delete') {
+
+        }
+    }
+
+}
+
+$usuarios = $usuario->readAll();
 
 $hello = "Crud Usuarios - PostgresSQL 16";
 
@@ -111,6 +162,11 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                 color: white;
             }
 
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+            }
+
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -158,14 +214,17 @@ $hello = "Crud Usuarios - PostgresSQL 16";
             }
         }
     </style>
+
 </head>
 <body>
 <div class="container">
     <h1><?php echo $hello; ?></h1>
 
-    <div class="alert alert-error">
-        Esta es una alerta de información.
-    </div>
+    <?php if (isset($_REQUEST['message']) && !empty($_REQUEST['message'])): ?>
+        <div class="alert alert-success">
+            <?php echo $messages[$_REQUEST['message']]; ?>
+        </div>
+    <?php endif; ?>
 
     <div class="card">
         <h2>Nuevo Usuario</h2>
@@ -175,20 +234,22 @@ $hello = "Crud Usuarios - PostgresSQL 16";
 
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required value="">
+                <input type="text" id="nombre" name="nombre" required value="Henry Vega">
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required value="">
+                <input type="email" id="email" name="email" required value="hp.vega21@gmail.com">
             </div>
 
             <div class="form-group">
-                <label for="phone">Teléfono:</label>
-                <input type="tel" id="phone" name="phone" required value="">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" required value="955201758">
             </div>
 
             <button type="submit" class="btn btn-primary">Enviar</button>
+
+            <button class="btn btn-secondary">Cancelar</button>
 
         </form>
 
@@ -206,18 +267,20 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Juan Pérez</td>
-                    <td>j@yopmail.com</td>
-                    <td>955201758</td>
-                    <td>
-                        <div class="actions">
-                            <div>Editar</div>
-                            <div>Eliminar</div>
-                        </div>
-                    </td>
-                </tr>
+                <?php foreach ($usuarios as $usuario) : ?>
+                    <tr>
+                        <td><?php echo $usuario['id'] ?></td>
+                        <td><?php echo $usuario['nombre'] ?></td>
+                        <td><?php echo $usuario['email'] ?></td>
+                        <td><?php echo $usuario['telefono'] ?></td>
+                        <td>
+                            <div class="actions">
+                                <div>Editar</div>
+                                <div>Eliminar</div>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
