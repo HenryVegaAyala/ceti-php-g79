@@ -51,6 +51,10 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                 padding-bottom: 10px;
             }
 
+            .form {
+                margin-bottom: 20px;
+            }
+
             .form-group {
                 margin-bottom: 15px;
 
@@ -106,6 +110,11 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                     padding: 12px;
                     text-align: left;
                     border-bottom: 1px solid #ddd;
+
+                    .actions {
+                        display: flex;
+                        gap: 5px;
+                    }
                 }
 
                 th {
@@ -120,19 +129,37 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                 }
             }
         }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+
+            &.alert-success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            &.alert-error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1><?php echo $hello; ?></h1>
 
-    <div class="alert alert-info">
+    <div class="alert alert-error">
         Esta es una alerta de información.
     </div>
 
     <div class="card">
         <h2>Nuevo Usuario</h2>
-        <form method="POST" action="">
+        <form method="POST" action="" class="form">
             <input type="hidden" name="action" value="create">
             <input type="hidden" name="id" value="1">
 
@@ -174,6 +201,12 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                     <td>Juan Pérez</td>
                     <td>j@yopmail.com</td>
                     <td>955201758</td>
+                    <td>
+                        <div class="actions">
+                            <div>Editar</div>
+                            <div>Eliminar</div>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>

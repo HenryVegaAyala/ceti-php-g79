@@ -22,7 +22,7 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_DB: crud_db
+      POSTGRES_DB: crud_php
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret123
     ports:
