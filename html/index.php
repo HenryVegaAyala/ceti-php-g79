@@ -284,8 +284,9 @@ $hello = "Crud Usuarios - PostgresSQL 16";
 
             <button type="submit" class="btn btn-primary">Enviar</button>
 
-            <button class="btn btn-secondary">Cancelar</button>
-
+            <?php if (isset($usuario_editar['id'])): ?>
+                <a href="index.php" class="btn btn-secondary">Cancelar</a>
+            <?php endif; ?>
         </form>
 
         <div class="card">
