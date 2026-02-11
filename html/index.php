@@ -18,6 +18,19 @@ $messages = [
 
 $mensaje = null;
 
+$usuario_editar = null;
+if (isset($_GET['edit'])) {
+    $usuario->id = (int)($_GET['edit']);
+    $resultado = $usuario->readOne();
+
+    $usuario_editar = [
+            'id' => $resultado['id'],
+            'nombre' => $resultado['nombre'],
+            'email' => $resultado['email'],
+            'telefono' => $resultado['telefono']
+    ];
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = $_POST["action"] ?? null;
 
@@ -25,11 +38,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario->email = $_POST["email"] ?? null;
     $usuario->telefono = $_POST["telefono"] ?? null;
 
+    if (isset($_POST["id"]) && !empty($_POST["id"])) {
+        $usuario->id = (int)$_POST["id"];
+    }
+
     $acciones = [
             'create' => ['method' => 'create', 'message' => 'created', 'error' => 'Error al crear el usuario'],
             'update' => ['method' => 'update', 'message' => 'updated', 'error' => 'Error al actualizar el usuario'],
-            'delete' => [],
+            'delete' => ['method' => 'delete', 'message' => 'deleted', 'error' => 'Error al eliminar el usuario'],
     ];
+
 
     if (isset($acciones[$action])) {
         $config = $acciones[$action];
@@ -48,12 +66,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // actualizar usuario
         if ($config['method'] == 'update') {
-
+            $respuesta = $usuario->update();
+            if ($respuesta) {
+                header("Location: index.php?message={$config['message']}");
+                exit();
+            } else {
+                $mensaje = $config['error'];
+            }
         }
+
 
         // eliminar usuario
         if ($config['method'] == 'delete') {
+            $resultado = $usuario->delete();
 
+            if ($resultado) {
+                header("Location: index.php?message={$config['message']}");
+                exit();
+            } else {
+                $mensaje = $config['error'];
+            }
         }
     }
 
@@ -229,22 +261,25 @@ $hello = "Crud Usuarios - PostgresSQL 16";
     <div class="card">
         <h2>Nuevo Usuario</h2>
         <form method="POST" action="" class="form">
-            <input type="hidden" name="action" value="create">
-            <input type="hidden" name="id" value="1">
+            <input type="hidden" name="action" value="<?php echo isset($usuario_editar['id']) ? 'update' : 'create' ?>">
+            <input type="hidden" name="id" value="<?php echo $usuario_editar['id'] ?? null ?>">
 
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required value="Henry Vega">
+                <input type="text" id="nombre" name="nombre" required
+                       value="<?php echo $usuario_editar['nombre'] ?? '' ?>">
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required value="hp.vega21@gmail.com">
+                <input type="email" id="email" name="email" required
+                       value="<?php echo $usuario_editar['email'] ?? '' ?>">
             </div>
 
             <div class="form-group">
                 <label for="telefono">Teléfono:</label>
-                <input type="tel" id="telefono" name="telefono" required value="955201758">
+                <input type="tel" id="telefono" name="telefono" required
+                       value="<?php echo $usuario_editar['telefono'] ?? '' ?>">
             </div>
 
             <button type="submit" class="btn btn-primary">Enviar</button>
@@ -275,8 +310,16 @@ $hello = "Crud Usuarios - PostgresSQL 16";
                         <td><?php echo $usuario['telefono'] ?></td>
                         <td>
                             <div class="actions">
-                                <div>Editar</div>
-                                <div>Eliminar</div>
+                                <div>
+                                    <a href="?edit=<?php echo $usuario['id'] ?>">Editar</a>
+                                </div>
+                                <div>
+                                    <form method="post" action="">
+                                        <input type="hidden" name="id" value="<?php echo $usuario['id'] ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="">Eliminar</button>
+                                    </form>
+                                </div>
                             </div>
                         </td>
                     </tr>

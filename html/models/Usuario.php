@@ -10,9 +10,9 @@ class Usuario
     private string $columns = "id, nombre, email, telefono, created_at";
 
     public int $id;
-    public string $nombre;
-    public string $email;
-    public string $telefono;
+    public ?string $nombre;
+    public ?string $email;
+    public ?string $telefono;
     public string $created_at;
     public string $error_message = '';
 
@@ -64,25 +64,38 @@ class Usuario
 
     public function update()
     {
-        $stmt = $this->connection->prepare(
-            "UPDATE {$this->table} 
-            nombre = :nombre, 
-            email = :email, 
-            telefono = :telefono
-            WHERE id = :id"
-        );
+        try {
+            $query = "UPDATE {$this->table} SET nombre = :nombre, email = :email, telefono = :telefono WHERE id = :id";
 
-        $stmt->execute([
-            ':email' => $this->email,
-            ':nombre' => $this->nombre,
-            ':telefono' => $this->telefono,
-            ':id' => $this->id
-        ]);
+            $stmt = $this->connection->prepare($query);
+
+            $stmt->execute([
+                ':email' => $this->email,
+                ':nombre' => $this->nombre,
+                ':telefono' => $this->telefono,
+                ':id' => $this->id
+            ]);
+
+            return true;
+        } catch (PDOException $e) {
+            print_r($e->getMessage());
+            return false;
+        }
     }
 
     public function delete()
     {
+        try {
+            $query = "DELETE FROM {$this->table} WHERE id = :id";
 
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute([":id" => $this->id]);
+
+            return true;
+        }catch (PDOException $e) {
+            print_r($e->getMessage());
+            return false;
+        }
     }
 
     public function readAll()
@@ -91,5 +104,20 @@ class Usuario
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function readOne()
+    {
+        try {
+            $query = "SELECT {$this->columns} FROM {$this->table} WHERE id = :id LIMIT 1";
+
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute([':id' => $this->id]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+
+            return false;
+        }
     }
 }
